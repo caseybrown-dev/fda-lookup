@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'search_page.dart';
+import 'search/search_page.dart';
 import 'favorites_page.dart';
 
 void main() {
@@ -15,6 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'FDA Drug Query',
       theme: ThemeData(
+        // primarySwatch: Colors.blue,
         primarySwatch: Colors.blue,
         useMaterial3: true
       ),
@@ -28,10 +29,10 @@ class MyApp extends StatelessWidget {
                   icon: Icon(Icons.search),
                   text: 'Search',
                 ),
-                Tab(
-                  icon: Icon(Icons.star),
-                  text: 'Favorites',
-                ),
+                // Tab(
+                //   icon: Icon(Icons.star),
+                //   text: 'Favorites',
+                // ),
               ],
             ),
             title: const Text('FDA Drug Query'),
@@ -39,7 +40,7 @@ class MyApp extends StatelessWidget {
           body: const TabBarView(
             children: [
               SearchPage(),
-              FavoritesPage(),
+              // FavoritesPage(),
             ],
           ),
         ),

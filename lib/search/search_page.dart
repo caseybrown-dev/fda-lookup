@@ -1,3 +1,5 @@
+import 'package:fda_lookup/search/dropdown.dart';
+import 'package:fda_lookup/search/search_type.dart';
 import 'package:flutter/material.dart';
 
 
@@ -9,6 +11,8 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
+
+  SearchType searchType = SearchType.values.first;
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +27,15 @@ class _SearchPageState extends State<SearchPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            SizedBox(
+              width: windowWidth * 0.25,
+            height: 50,
+            child: SearchModeDropdownButton(
+                    onChanged: (SearchType value) => {
+                      searchType = value
+                    })
+            ),
+            const SizedBox(height: 30),
             SizedBox(
               width: windowWidth * 0.5,
               height: 50,
