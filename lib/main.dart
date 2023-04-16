@@ -29,10 +29,10 @@ class MyApp extends StatelessWidget {
                   icon: Icon(Icons.search),
                   text: 'Search',
                 ),
-                // Tab(
-                //   icon: Icon(Icons.star),
-                //   text: 'Favorites',
-                // ),
+                Tab(
+                  icon: Icon(Icons.star),
+                  text: 'Favorites',
+                ),
               ],
             ),
             title: const Text('FDA Drug Query'),
@@ -40,7 +40,7 @@ class MyApp extends StatelessWidget {
           body: const TabBarView(
             children: [
               SearchPage(),
-              // FavoritesPage(),
+              FavoritesPage(),
             ],
           ),
         ),
