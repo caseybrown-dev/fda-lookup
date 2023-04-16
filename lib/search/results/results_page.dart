@@ -11,31 +11,80 @@ class ResultsPage extends StatefulWidget {
 
   final SearchType searchType;
   final String input;
+  final bool exact;
 
-  const ResultsPage({super.key, required this.searchType, required this.input});
+  const ResultsPage(
+      {super.key,
+      required this.searchType,
+      required this.input,
+      required this.exact});
 
   @override
   State<StatefulWidget> createState() => _ResultsPageState();
 }
 
 class _ResultsPageState extends State<ResultsPage> {
-  late Future<Map<String, dynamic>> futureDrugs;
+  late Future<List<dynamic>> futureDrugs;
 
-  Future<Map<String, dynamic>> fetchDrugs() async {
+  Future<List<dynamic>> fetchDrugs() async {
     String queryParam = '?search=';
-    queryParam += '${widget.searchType.param}:"${widget.input}"';
-    queryParam += '&limit=5';
-    final response =
-        await http.get(Uri.parse('${widget.ndcApiEndpoint}$queryParam'));
+
+    String input = widget.input.replaceAll(" ", "+");
+    if (widget.exact) {
+      queryParam += '${widget.searchType.param}:"${widget.input}"';
+    } else {
+      queryParam += '${widget.searchType.param}:${widget.input}';
+    }
+    queryParam += '&limit=1000';
+
+    final results = await fetchResults('${widget.ndcApiEndpoint}$queryParam');
+
+    results.sort((a, b) {
+      String aBrandName = a!['brand_name'] ?? '';
+      String bBrandName = b!['brand_name'] ?? '';
+      if (aBrandName.isNotEmpty &&
+          bBrandName.isNotEmpty &&
+          aBrandName != bBrandName) {
+        return aBrandName.compareTo(bBrandName);
+      }
+      String aGenericName = a!['generic_name'] ?? '';
+      String bGenericName = b!['generic_name'] ?? '';
+      if (aGenericName.isNotEmpty &&
+          bGenericName.isNotEmpty &&
+          aGenericName != bGenericName) {
+        return aGenericName.compareTo(bGenericName);
+      }
+
+      String aNdc = a!['product_ndc'] ?? '';
+      String bNdc = b!['product_ndc'] ?? '';
+      return aNdc.compareTo(bNdc);
+    });
+
+    return results;
+  }
+
+  Future<List<dynamic>> fetchResults(String url) async {
+    final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.
-      return jsonDecode(response.body);
+      List<dynamic> results = jsonDecode(response.body)['results'];
+
+      // Results will only be fetched 1000 at a time, this will send the paginated requests
+      if (response.headers['link'] != null) {
+        String url = response.headers['link']!;
+        url = url.split(';')[0];
+        url = url.substring(1, url.length - 1);
+        List<dynamic> nextResults = await fetchResults(url);
+        results.addAll(nextResults);
+      }
+
+      return results;
     } else {
       // If the server did not return a 200 OK response,
       // then throw an exception.
-      throw Exception('Failed to load album');
+      throw Exception('No matching drugs found');
     }
   }
 
@@ -56,11 +105,11 @@ class _ResultsPageState extends State<ResultsPage> {
       body: Center(
           child: ListView(
         children: <Widget>[
-          FutureBuilder<Map<String, dynamic>>(
+          FutureBuilder<List<dynamic>>(
             future: futureDrugs,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                List<dynamic> results = snapshot.data!['results'];
+                List<dynamic> results = snapshot.data!;
                 return Column(
                     children: results
                         .map((result) => SizedBox(

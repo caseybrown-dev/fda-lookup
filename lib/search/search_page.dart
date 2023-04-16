@@ -11,7 +11,6 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-
   SearchType searchType = SearchType.values.first;
   final inputFieldController = TextEditingController();
 
@@ -35,13 +34,24 @@ class _SearchPageState extends State<SearchPage> {
                   onChanged: (SearchType value) => {searchType = value})),
           const SizedBox(height: 30),
           SizedBox(
-            width: windowWidth * 0.5,
-            height: 50,
-            child:  TextField(
-              controller: inputFieldController,
-              obscureText: false,
+              width: windowWidth * 0.5,
+              height: 50,
+              child: TextField(
+                controller: inputFieldController,
+                obscureText: false,
                 decoration: const InputDecoration(border: OutlineInputBorder()),
-          )),
+                onSubmitted: (text) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ResultsPage(
+                              searchType: searchType,
+                              input: text,
+                              exact: false,
+                            )),
+                  );
+                },
+              )),
           const SizedBox(height: 30),
           SizedBox(
             width: windowWidth * 0.5,
@@ -51,7 +61,12 @@ class _SearchPageState extends State<SearchPage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ResultsPage(searchType: searchType, input: inputFieldController.text,)),
+                  MaterialPageRoute(
+                      builder: (context) => ResultsPage(
+                            searchType: searchType,
+                            input: inputFieldController.text,
+                            exact: false,
+                          )),
                 );
               },
               child: const Text('Search'),

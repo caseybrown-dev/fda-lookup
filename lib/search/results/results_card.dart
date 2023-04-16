@@ -12,12 +12,41 @@ class ResultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (result == null ){
+      return const SizedBox.shrink();
+    }
+
+    String title = '';
+    String subtitle = '';
+
+    var brandName = result!['brand_name'];
+    var activeIngredients = result!['active_ingredients'];
+    if (activeIngredients != null) {
+      if (brandName != null) {
+        title = '$brandName ${activeIngredients![0]!['strength']}';
+        subtitle = activeIngredients![0]!['name'];
+      } else {
+        title = '${activeIngredients![0]!['name']} ${activeIngredients![0]!['strength']}';
+      }
+    } else {
+      if (brandName != null) {
+        title = brandName;
+        subtitle = result!['generic_name'];
+      } else {
+        title = result!['generic_name'];
+      }
+    }
+
     return Card(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Text('${result!['brand_name']} (${result!['active_ingredients']![0]!['name']}) ${result!['active_ingredients']![0]!['strength']}'),
+            ListTile(
+              // leading: Icon(Icons.album),
+              title: Text(title),
+              subtitle: subtitle.isEmpty ? const SizedBox.shrink() : Text(subtitle),
+            ),
             // Text(result.toString())
             Text('NDC9: ${result!['product_ndc']}', textAlign: TextAlign.left),
             Text(
